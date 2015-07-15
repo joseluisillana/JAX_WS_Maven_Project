@@ -1,0 +1,66 @@
+<html>
+<head>
+<title>Calling Web Service from jQuery</title>
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+        $(document).ready(function () {
+            $("#btnCallWebService").click(function (event) {
+                var wsUrl = "http://localhost:8080/HelloService/helloWebService?op=sayHello&guestname=lola";
+
+                var soapRequest =
+				'<soapenv:Envelope \
+				xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" \
+				xmlns:soap="http://soapDemo.jlir.com/">\
+					<soapenv:Header/> \
+					<soapenv:Body> \
+						<soap:sayHello> \
+							<guestname>'+ encoding($("#txtName").val()) +'</guestname> \
+						</soap:sayHello> \
+					</soapenv:Body> \
+				</soapenv:Envelope>';
+
+                $.ajax({
+                    type: "POST",
+                    url: wsUrl,
+                    contentType: "text/xml",
+                    dataType: "xml",
+                    data: soapRequest,
+                    //data: lola',
+                    success: processSuccess,
+                    error: processError
+                });
+
+            });
+        });
+
+        function processSuccess(data, status, req) {
+		      if (status == "success")
+                $("#response").text($(req.responseXML).find("sayHelloResponse").text());
+        }
+
+        function processError(data, status, req) {
+            alert(req.responseText + " " + status);
+        }  
+
+ 
+     function encoding (text) {
+       	    return text.replace(/&/g, '&amp;')
+       	               .replace(/</g, '&lt;')
+       	               .replace(/>/g, '&gt;')
+       	               .replace(/"/g, '&quot;')
+       	               .replace(/'/g, '&apos;');
+       	  };
+       	
+        //]]>
+    </script>
+</head>
+<body>
+	<h3>Calling Web Services with jQuery/AJAX</h3>
+	Enter your name:
+	<input id="txtName" type="text" />
+	<input id="btnCallWebService" value="Call web service" type="button" />
+	<div id="response" />
+</body>
+</html>
